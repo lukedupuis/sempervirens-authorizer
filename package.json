@@ -1,6 +1,6 @@
 {
   "name": "@sempervirens/authorizer",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Middleware for authorizing requests to an Express server",
   "main": "index.js",
   "type": "module",
