@@ -80,8 +80,8 @@ app.get('/profile/:id', async (req, res, next) => {
 
 ### authorizer (Singleton instance)
 
-| Prop  | Type | Params | Description
-|-------|------|--------|------------
+| Prop  | Type | Params | Description |
+|-------|------|--------|-------------|
 | `init` | Function | `{ jwtPublicKey = '', jwtPrivateKey = '' }` | Initializes the instance properties. |
 | `encryptJwt` | Function | `{ expiresIn = '', data: {} }` | Returns a JWT token. |
 | `decryptJwt` | Function | `token` | Decrypts a JWT token. |

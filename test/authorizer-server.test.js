@@ -17,7 +17,7 @@ const app = express();
 app.use(express.json());
 
 // Set up a /login route
-app.post('/login', async (req, res, next) => {
+app.post('/login', (req, res, next) => {
   const { email, password } = req.body;
   // Validate email/password combination; do not use the following except for testing
   const isValid = email == 'test@test.com' && password == 'testpassword';
@@ -33,7 +33,7 @@ app.post('/login', async (req, res, next) => {
 });
 
 // Set up a protected resource route
-app.get('/profile/:id', async (req, res, next) => {
+app.get('/profile/:id', (req, res, next) => {
   const { id } = req.params;
   if (authorizer.isAuthorized(req)) { // Pass request header 'Authorization': 'Bearer ${token}'
     const profile = {

@@ -70,7 +70,7 @@ describe('1. Authorizer', () => {
   // return;
 
   describe('1.3. When "encryptJwt" is called', () => {
-    return;
+    // return;
 
     describe('1.3.1. When required properties are not given', () => {
 
