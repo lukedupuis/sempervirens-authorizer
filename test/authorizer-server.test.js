@@ -47,7 +47,7 @@ app.get('/profile/:id', (req, res, next) => {
   }
 });
 
-http.createServer(app).listen(80);
+http.createServer(app).listen(8080);
 
 describe('2. When authorizer is used in Express routes', () => {
   // return;
@@ -56,7 +56,7 @@ describe('2. When authorizer is used in Express routes', () => {
     // return;
     it('2.1.1. Should return a token', async () => {
       const { body: b1 } = await superagent
-        .post('/login')
+        .post('http://localhost:8080/login')
         .send({
           email: 'test@test.com',
           password: 'testpassword'
@@ -72,13 +72,13 @@ describe('2. When authorizer is used in Express routes', () => {
       // return;
       it('2.2.1.1. Should return the requested data', async () => {
         const { body: b1 } = await superagent
-          .post('/login')
+          .post('http://localhost:8080/login')
           .send({
             email: 'test@test.com',
             password: 'testpassword'
           });
         const { body: b2 } = await superagent
-          .get('/profile/test-id')
+          .get('http://localhost:8080/profile/test-id')
           .set('Authorization', `Bearer ${b1.token}`)
           .send();
         expect(b2.profile.email).to.equal('test@test.com');
@@ -90,7 +90,7 @@ describe('2. When authorizer is used in Express routes', () => {
       it('2.2.2.1. Should return an error', async () => {
         try {
           await superagent
-            .get('/profile/test-id')
+            .get('http://localhost:8080/profile/test-id')
             .set('Authorization', `Bearer token`)
             .send();
         } catch(error) {
