@@ -1,6 +1,8 @@
 # Sempervirens Authorizer
 Middleware for authorizing requests to an Express server.
 
+![Tests badge](https://github.com/lukedupuis/sempervirens-authorizer/actions/workflows/main.yml/badge.svg?event=push) ![Version badge](https://img.shields.io/static/v1?label=Node.js&labelColor=30363c&message=16.x&color=blue)
+
 ## Installation
 
 `npm i @sempervirens/authorizer`

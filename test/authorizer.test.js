@@ -230,6 +230,7 @@ describe('1. Authorizer', () => {
         expect(isValid).to.be.true;
       });
     });
+
     describe('1.7.2. When token is not valid', () => {
       // return;
       it('1.7.2.1. Should return false', async () => {
@@ -240,6 +241,7 @@ describe('1. Authorizer', () => {
         expect(isValid).to.be.false;
       });
     });
+
   });
 
   // return;
