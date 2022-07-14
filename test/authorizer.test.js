@@ -15,6 +15,7 @@ describe('1. Authorizer', () => {
 
   describe('1.1. When functions relying on the JWT public and private keys are called before passing the keys into "init"', () => {
     // return;
+
     describe('1.1.1. When "encryptJwt" is called', () => {
       it('1.1.1.1. Should throw an error', () => {
         try {
@@ -43,6 +44,7 @@ describe('1. Authorizer', () => {
 
   describe('1.2. When "init" is called', () => {
     // return;
+
     describe('1.2.1. When required properties are not given', () => {
       describe('1.2.1.1. When "jwtPublicKey" is not given', () => {
         it('1.2.1.1.1. An error should be thrown', () => {
@@ -54,6 +56,7 @@ describe('1. Authorizer', () => {
           }
         });
       });
+
       describe('1.2.1.2. When "jwtPrivateKey" is not given', () => {
         it('1.2.1.2.1. An error should be thrown', () => {
           try {
@@ -123,40 +126,35 @@ describe('1. Authorizer', () => {
     // return;
 
     describe('1.4.1. When required properties are not given', () => {
+      // return;
 
-      describe('1.4.1.1. When "token" is not given or is not a string', () => {
+      describe('1.4.1.1. When "token" is not valid', () => {
         it('1.4.1.1.1. Should throw an error', () => {
           authorizer.init({ jwtPublicKey, jwtPrivateKey });
-          authorizer.encryptJwt({ expiresIn: '1m', data: { test: 1 } });
           try {
             authorizer.decryptJwt();
             expect(false).to.be.true;
           } catch(error) {
-            expect(error.message).to.equal('"token" is required and must be a string.');
+            expect(error.message).to.equal('"token" does not exist.');
           }
           try {
             authorizer.decryptJwt(1);
             expect(false).to.be.true;
           } catch(error) {
-            expect(error.message).to.equal('"token" is required and must be a string.');
+            expect(error.message).to.equal('"token" does not exist.');
           }
-        });
-      });
-
-      describe('1.4.1.2. When "token" is not a vaild JWT token', () => {
-        it('1.4.1.2.1. Should throw an error', () => {
-          authorizer.init({ jwtPublicKey, jwtPrivateKey });
           try {
-            authorizer.decryptJwt('not a real token');
+            authorizer.decryptJwt('not a valid token');
             expect(false).to.be.true;
           } catch(error) {
-            expect(error.message).to.equal('jwt malformed');
+            expect(error.message).to.equal('"token" does not exist.');
           }
         });
       });
 
-      describe('1.4.1.3. When "token" has expired', () => {
-        it('1.4.1.3.1. Should throw an error', async () => {
+      describe('1.4.1.2. When "token" has expired', () => {
+        // return;
+        it('1.4.1.2.1. Should throw an error', async () => {
           authorizer.init({ jwtPublicKey, jwtPrivateKey });
           const token = authorizer.encryptJwt({ expiresIn: '.5s', data: { test: 1 } });
           await new Promise(resolve => setTimeout(resolve, 600));
@@ -170,6 +168,8 @@ describe('1. Authorizer', () => {
       });
 
     });
+
+    // return;
 
     describe('1.4.2. When a valid token is given', () => {
       it('1.4.2.1. Should decrypt the token', () => {
@@ -246,11 +246,25 @@ describe('1. Authorizer', () => {
 
   // return;
 
-  describe('1.8. When "isAuthorized" is called', () => {
+  describe('1.8. When "invalidateToken" is called', () => {
+    it('1.8.1. Should invalitate the token', () => {
+      authorizer.init({ jwtPublicKey, jwtPrivateKey });
+      const token = authorizer.encryptJwt({ expiresIn: '1m', data: { test: 1 } });
+      const isValid1 = authorizer.isTokenValid(token);
+      expect(isValid1).to.be.true;
+      authorizer.invalidateToken(token);
+      const isValid2 = authorizer.isTokenValid(token);
+      expect(isValid2).to.be.false;
+    });
+  });
+
+  // return;
+
+  describe('1.9. When "isAuthorized" is called', () => {
     // return;
 
-    describe('1.8.1. When a valid static secret is passed as a query parameter', () => {
-      it('1.8.1.1. Should return true', () => {
+    describe('1.9.1. When a valid static secret is passed as a query parameter', () => {
+      it('1.9.1.1. Should return true', () => {
         authorizer.init({
           jwtPublicKey,
           jwtPrivateKey,
@@ -262,8 +276,8 @@ describe('1. Authorizer', () => {
       });
     });
 
-    describe('1.8.2. When an invalid static secret is passed as a query parameter', () => {
-      it('1.8.2.1. Should return false', () => {
+    describe('1.9.2. When an invalid static secret is passed as a query parameter', () => {
+      it('1.9.2.1. Should return false', () => {
         authorizer.init({
           jwtPublicKey,
           jwtPrivateKey,
@@ -275,8 +289,8 @@ describe('1. Authorizer', () => {
       });
     });
 
-    describe('1.8.3. When a valid token is passed in the authorization header as Bearer', () => {
-      it('1.8.3.1. Should return true', () => {
+    describe('1.9.3. When a valid token is passed in the authorization header as Bearer', () => {
+      it('1.9.3.1. Should return true', () => {
         authorizer.init({ jwtPublicKey, jwtPrivateKey });
         const token = authorizer.encryptJwt({ expiresIn: '1m', data: { test: 1 } });
         const req = { headers: { authorization: `Bearer ${token}` } };
@@ -285,8 +299,8 @@ describe('1. Authorizer', () => {
       });
     });
 
-    describe('1.8.4. When an invalid token is passed in the authorization header as Bearer', () => {
-      it('1.8.4.1. Should return true', () => {
+    describe('1.9.4. When an invalid token is passed in the authorization header as Bearer', () => {
+      it('1.9.4.1. Should return true', () => {
         authorizer.init({ jwtPublicKey, jwtPrivateKey });
         const req = { headers: { authorization: 'Bearer token' } };
         const isAuthorized = authorizer.isAuthorized(req);
@@ -298,10 +312,10 @@ describe('1. Authorizer', () => {
 
   // return;
 
-  describe('1.9. When "authorize" is called', () => {
+  describe('1.10. When "authorize" is called', () => {
     // return;
-    describe('1.9.1. When the request is authorized', () => {
-      it('1.9.1.1. Should allow proceeding to the next middleware', () =>  {
+    describe('1.10.1. When the request is authorized', () => {
+      it('1.10.1.1. Should allow proceeding to the next middleware', () =>  {
         authorizer.init({ jwtPublicKey, jwtPrivateKey });
         const token = authorizer.encryptJwt({ expiresIn: '1m', data: { test: 1 } });
         const req = { headers: { authorization: `Bearer ${token}` } };
@@ -311,8 +325,8 @@ describe('1. Authorizer', () => {
         expect(next).to.be.have.been.called();
       });
     });
-    describe('1.9.2. When the request is not authorized', () => {
-      it('1.9.2.1. Should call prevent proceeding to the next middleware and call "sendUnauthorized"', () =>  {
+    describe('1.10.2. When the request is not authorized', () => {
+      it('1.10.2.1. Should call prevent proceeding to the next middleware and call "sendUnauthorized"', () =>  {
         authorizer.init({ jwtPublicKey, jwtPrivateKey });
         const req = { headers: { authorization: 'Bearer token' } };
         const res = { status: () => ({ send: () => null }) };
@@ -327,8 +341,8 @@ describe('1. Authorizer', () => {
 
   // return;
 
-  describe('1.10. When "sendUnauthorized" is called', () => {
-    it('1.10.1. Should call send a response with 401 status and error data ', () => {
+  describe('1.11. When "sendUnauthorized" is called', () => {
+    it('1.11.1. Should call send a response with 401 status and error data ', () => {
       authorizer.init({ jwtPublicKey, jwtPrivateKey });let sendData;
       const send = d => sendData = d;
       const res = { status: () => ({ send }) };
@@ -348,5 +362,7 @@ describe('1. Authorizer', () => {
       });
     });
   });
+
+  // return;
 
 });

@@ -1,7 +1,7 @@
 # Sempervirens Authorizer
 Middleware for authorizing requests to an Express server.
 
-![Tests badge](https://github.com/lukedupuis/sempervirens-authorizer/actions/workflows/main.yml/badge.svg?event=push) ![Version badge](https://img.shields.io/static/v1?label=Node.js&labelColor=30363c&message=16.x&color=blue)
+![Tests badge](https://github.com/lukedupuis/sempervirens-authorizer/actions/workflows/main.yml/badge.svg?event=push) ![Version badge](https://img.shields.io/static/v1?label=Node&labelColor=30363c&message=16.x&color=blue)
 
 ## Installation
 
@@ -90,6 +90,7 @@ app.get('/profile/:id', async (req, res, next) => {
 | `getHeaderToken` | Function | `req: express.Request` | Parses a token from the `'Authorization': 'Bearer ${token}'` header, returning the token. |
 | `decryptHeaderToken` | Function | `req: express.Request` | Parses a token from the `'Authorization': 'Bearer ${token}'` header, decrypts it, and returns the decrypted data. |
 | `isTokenValid` | Function | `token` | Returns `true` or `false`. |
-| `isAuthorized` | Function | `req: express.Request` | Parses a token from the `'Authorization': 'Bearer ${token}'`, checks if it's valid, and returns `true` or `false` |
+| `invalidateToken` | Function | `token` | Invalidates a token within `authorizer`. |
+| `isAuthorized` | Function | `req: express.Request` | Parses a token from the `'Authorization': 'Bearer ${token}'`, checks if it's valid, and returns `true` or `false`. |
 | `authorize` | Function | `req: express.Request, res: express.Request, next` | Checks if the token is valid. If so, it calls next. If not, it calls `sendUnauthorized`.|
-| `sendUnauthorized` | Function | `res: express.Request` | Sends a 401 response with a pre-formatted data object in the same shape as `@sempervirens/endpoint`'s error response.|
+| `sendUnauthorized` | Function | `res: express.Request` | Sends a 401 response with a pre-formatted data object in the same shape as `@sempervirens/endpoint`'s error response. |

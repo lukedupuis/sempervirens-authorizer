@@ -6,6 +6,8 @@ export class Authorizer {
   #jwtPrivateKey;
   #staticSecrets;
 
+  #tokens = new Set();
+
   constructor() {}
 
   init({
@@ -35,21 +37,23 @@ export class Authorizer {
     if (!data || typeof data != 'object' || Object.keys(data).length == 0) {
       throw new Error('"data" is required and must be a key:value object.');
     }
-    return jwt.sign({
+    const token = jwt.sign({
       ...data,
       expiresIn
     }, this.#jwtPrivateKey, {
       expiresIn,
       algorithm: 'RS256'
     });
+    this.#tokens.add(token);
+    return token;
   }
 
   decryptJwt(token) {
     if (!this.#jwtPublicKey || !this.#jwtPrivateKey) {
       throw new Error('"init" must be called with JWT public and private keys first.');
     }
-    if (!token || typeof token != 'string') {
-      throw new Error('"token" is required and must be a string.');
+    if (!this.#tokens.has(token)) {
+      throw new Error('"token" does not exist.');
     }
     const decrypted = jwt.verify(token, this.#jwtPublicKey);
     decrypted.createdAt = new Date(decrypted.iat * 1000);
@@ -76,6 +80,10 @@ export class Authorizer {
     } catch(error) {
       return false;
     }
+  }
+
+  invalidateToken(token) {
+    this.#tokens.delete(token);
   }
 
   // Authorization
