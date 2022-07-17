@@ -11,7 +11,7 @@ const { expect, spy } = chai;
 const jwtPublicKey = readFileSync('./security/jwt/jwtRS256.key.pub', 'utf8');
 const jwtPrivateKey = readFileSync('./security/jwt/jwtRS256.key', 'utf8');
 
-describe('1. Authorizer', () => {
+describe('1. authorizer', () => {
 
   describe('1.1. When functions relying on the JWT public and private keys are called before passing the keys into "init"', () => {
     // return;
