@@ -295,8 +295,8 @@ describe('1. authorizer', () => {
         const token2 = authorizer.resetToken(token1);
         const decrypted2 = authorizer.decrypt(token2);
         expect(decrypted2.origIat).to.equal(decrypted1.iat);
-        expect(decrypted2.iat - decrypted1.iat).to.equal(1);
-        expect(decrypted2.exp - decrypted1.exp).to.equal(1);
+        expect(decrypted2.iat).to.be.greaterThan(decrypted1.iat);
+        expect(decrypted2.exp).to.be.greaterThan(decrypted1.exp);
       });
     });
 
@@ -312,8 +312,8 @@ describe('1. authorizer', () => {
         const token2 = authorizer.resetToken(req);
         const decrypted2 = authorizer.decrypt(token2);
         expect(decrypted2.origIat).to.equal(decrypted1.iat);
-        expect(decrypted2.iat - decrypted1.iat).to.equal(1);
-        expect(decrypted2.exp - decrypted1.exp).to.equal(1);
+        expect(decrypted2.iat).to.be.greaterThan(decrypted1.iat);
+        expect(decrypted2.exp).to.be.greaterThan(decrypted1.exp);
       });
     });
 
