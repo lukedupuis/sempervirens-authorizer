@@ -248,7 +248,7 @@ describe('1. authorizer', () => {
 
   // return;
 
-  describe('1.8. When "invalidateToken" is called', () => {
+  describe('1.8. When "invalidate" is called', () => {
     // return;
 
     describe('1.8.1. When the token is given directly', () => {
@@ -258,7 +258,7 @@ describe('1. authorizer', () => {
         const token = authorizer.encrypt({ expiresIn: '1m', data: { test: 1 } });
         const isValid1 = authorizer.isValid(token);
         expect(isValid1).to.be.true;
-        authorizer.invalidateToken(token);
+        authorizer.invalidate(token);
         const isValid2 = authorizer.isValid(token);
         expect(isValid2).to.be.false;
       });
@@ -272,7 +272,7 @@ describe('1. authorizer', () => {
         const req = { headers: { authorization: `Bearer ${token}` } };
         const isValid1 = authorizer.isValid(req);
         expect(isValid1).to.be.true;
-        authorizer.invalidateToken(req);
+        authorizer.invalidate(req);
         const isValid2 = authorizer.isValid(token);
         expect(isValid2).to.be.false;
       });
@@ -282,7 +282,7 @@ describe('1. authorizer', () => {
 
   // return;
 
-  describe('1.9. When "resetToken" is called', () => {
+  describe('1.9. When "reset" is called', () => {
 
     describe('1.9.1. When the token is given directly', () => {
       // return;
@@ -292,7 +292,7 @@ describe('1. authorizer', () => {
         const decrypted1 = authorizer.decrypt(token1);
         expect(decrypted1.origIat).to.be.undefined;
         await new Promise(resolve => setTimeout(() => resolve(), 1000));
-        const token2 = authorizer.resetToken(token1);
+        const token2 = authorizer.reset(token1);
         const decrypted2 = authorizer.decrypt(token2);
         expect(decrypted2.origIat).to.equal(decrypted1.iat);
         expect(decrypted2.iat).to.be.greaterThan(decrypted1.iat);
@@ -309,7 +309,7 @@ describe('1. authorizer', () => {
         expect(decrypted1.origIat).to.be.undefined;
         await new Promise(resolve => setTimeout(() => resolve(), 1000));
         const req = { headers: { authorization: `Bearer ${token1}` } };
-        const token2 = authorizer.resetToken(req);
+        const token2 = authorizer.reset(req);
         const decrypted2 = authorizer.decrypt(token2);
         expect(decrypted2.origIat).to.equal(decrypted1.iat);
         expect(decrypted2.iat).to.be.greaterThan(decrypted1.iat);

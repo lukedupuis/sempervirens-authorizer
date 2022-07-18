@@ -53,7 +53,7 @@ export class Authorizer {
     if (!this.#jwtPublicKey || !this.#jwtPrivateKey) {
       throw new Error('"init" must be called with JWT public and private keys first.');
     }
-    const token = this.#parseToken(tokenOrReq);
+    const token = this.#parse(tokenOrReq);
     if (!this.#tokens.has(token)) {
       throw new Error('"token" is invalid.');
     }
@@ -61,7 +61,7 @@ export class Authorizer {
     return decrypted;
   }
 
-  #parseToken(tokenOrReq) {
+  #parse(tokenOrReq) {
     if (tokenOrReq && !tokenOrReq.headers) return tokenOrReq;
     const header = tokenOrReq?.headers?.authorization?.split(' ') || [];
     const token = header[0] == 'Bearer' && header[1];
@@ -77,19 +77,19 @@ export class Authorizer {
     }
   }
 
-  invalidateToken(tokenOrReq) {
-    const token = this.#parseToken(tokenOrReq);
+  invalidate(tokenOrReq) {
+    const token = this.#parse(tokenOrReq);
     this.#tokens.delete(token);
   }
 
-  resetToken(tokenOrReq) {
-    const token = this.#parseToken(tokenOrReq);
+  reset(tokenOrReq) {
+    const token = this.#parse(tokenOrReq);
     const decrypted = this.decrypt(token);
     if (!decrypted.origIat) decrypted.origIat = decrypted.iat;
     const expiresIn = decrypted.exp - decrypted.iat;
     delete decrypted.exp;
     delete decrypted.iat;
-    this.invalidateToken(token);
+    this.invalidate(token);
     return this.encrypt({
       expiresIn,
       data: decrypted
