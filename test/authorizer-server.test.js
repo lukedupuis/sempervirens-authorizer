@@ -8,10 +8,7 @@ import authorizer from '../src/authorizer.class.js';
 const jwtPublicKey = readFileSync('./security/jwt/jwtRS256.key.pub', 'utf8');
 const jwtPrivateKey = readFileSync('./security/jwt/jwtRS256.key', 'utf8');
 
-authorizer.init({
-  jwtPublicKey,
-  jwtPrivateKey
-});
+authorizer.init({ jwtPublicKey, jwtPrivateKey });
 
 const app = express();
 app.use(express.json());
@@ -22,7 +19,7 @@ app.post('/login', (req, res, next) => {
   // Validate email/password combination; do not use the following except for testing
   const isValid = email == 'test@test.com' && password == 'testpassword';
   if (isValid) {
-    const token = authorizer.encryptJwt({
+    const token = authorizer.encrypt({
       expiresIn: '10m',
       data: { email }
     });
@@ -52,7 +49,7 @@ http.createServer(app).listen(8080);
 describe('2. When authorizer is used in Express routes', () => {
   // return;
 
-  describe('2.1. When an endpoint implements "encryptJwt"', () => {
+  describe('2.1. When an endpoint implements "encrypt"', () => {
     // return;
     it('2.1.1. Should return a token', async () => {
       const { body: b1 } = await superagent

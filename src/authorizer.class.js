@@ -22,9 +22,11 @@ export class Authorizer {
     this.#staticSecrets = staticSecrets || {};
   }
 
+
+
   // Tokens
 
-  encryptJwt({
+  encrypt({
     expiresIn,
     data = {}
   }) {
@@ -38,8 +40,7 @@ export class Authorizer {
       throw new Error('"data" is required and must be a key:value object.');
     }
     const token = jwt.sign({
-      ...data,
-      expiresIn
+      ...data
     }, this.#jwtPrivateKey, {
       expiresIn,
       algorithm: 'RS256'
@@ -48,42 +49,51 @@ export class Authorizer {
     return token;
   }
 
-  decryptJwt(token) {
+  decrypt(tokenOrReq) {
     if (!this.#jwtPublicKey || !this.#jwtPrivateKey) {
       throw new Error('"init" must be called with JWT public and private keys first.');
     }
+    const token = this.#parseToken(tokenOrReq);
     if (!this.#tokens.has(token)) {
-      throw new Error('"token" does not exist.');
+      throw new Error('"token" is invalid.');
     }
     const decrypted = jwt.verify(token, this.#jwtPublicKey);
-    decrypted.createdAt = new Date(decrypted.iat * 1000);
-    decrypted.expiresAt = new Date(decrypted.exp * 1000);
     return decrypted;
   }
 
-  getHeaderToken(req) {
-    const header = req?.headers?.authorization?.split(' ') || [];
+  #parseToken(tokenOrReq) {
+    if (tokenOrReq && !tokenOrReq.headers) return tokenOrReq;
+    const header = tokenOrReq?.headers?.authorization?.split(' ') || [];
     const token = header[0] == 'Bearer' && header[1];
     return token;
   }
 
-  decryptHeaderToken(req) {
-    const token = this.getHeaderToken(req);
-    const decrypted = this.decryptJwt(token);
-    return decrypted;
-  }
-
-  isTokenValid(token) {
+  isTokenValid(tokenOrReq) {
     try {
-      this.decryptJwt(token);
+      this.decrypt(tokenOrReq);
       return true;
     } catch(error) {
       return false;
     }
   }
 
-  invalidateToken(token) {
+  invalidateToken(tokenOrReq) {
+    const token = this.#parseToken(tokenOrReq);
     this.#tokens.delete(token);
+  }
+
+  resetToken(tokenOrReq) {
+    const token = this.#parseToken(tokenOrReq);
+    const decrypted = this.decrypt(token);
+    if (!decrypted.origIat) decrypted.origIat = decrypted.iat;
+    const expiresIn = decrypted.exp - decrypted.iat;
+    delete decrypted.exp;
+    delete decrypted.iat;
+    this.invalidateToken(token);
+    return this.encrypt({
+      expiresIn,
+      data: decrypted
+    });
   }
 
   // Authorization
@@ -103,8 +113,7 @@ export class Authorizer {
     if (this.#isValidStaticSecret(req)) {
       return true;
     } else {
-      const token = this.getHeaderToken(req);
-      const isValid = this.isTokenValid(token);
+      const isValid = this.isTokenValid(req);
       return isValid;
     }
   }

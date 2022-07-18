@@ -21,7 +21,7 @@ openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
 
 2. Import `authorizer` into the server's main file, and then initialize `authorizer` with the JWT public and private keys.
 
-3. Set up a route that uses `authorizer.encryptJwt` to create a token and return the token to the client.
+3. Set up a route that uses `authorizer.encrypt` to create a token and return the token to the client.
 
 4. Set up another route with a protected resource that requires a valid token.
 
@@ -39,10 +39,7 @@ import authorizer from '@sempervirens/authorizer';
 const jwtPublicKey = readFileSync('./security/jwt/jwtRS256.key.pub', 'utf8');
 const jwtPrivateKey = readFileSync('./security/jwt/jwtRS256.key', 'utf8');
 
-authorizer.init({
-  jwtPublicKey,
-  jwtPrivateKey
-});
+authorizer.init({ jwtPublicKey, jwtPrivateKey });
 
 const app = express();
 app.use(express.json());
@@ -53,7 +50,7 @@ app.post('/login', async (req, res, next) => {
   // Validate email/password combination; do not use the following except for testing
   const isValid = email == 'test@test.com' && password == 'testpassword';
   if (isValid) {
-    const token = authorizer.encryptJwt({
+    const token = authorizer.encrypt({
       expiresIn: '10m',
       data: { email }
     });
@@ -84,13 +81,12 @@ app.get('/profile/:id', async (req, res, next) => {
 
 | Prop  | Type | Params | Description |
 |-------|------|--------|-------------|
-| `init` | Function | `{ jwtPublicKey = '', jwtPrivateKey = '' }` | Initializes the instance properties. |
-| `encryptJwt` | Function | `{ expiresIn = '', data: {} }` | Returns a JWT token. |
-| `decryptJwt` | Function | `token` | Decrypts a JWT token. |
-| `getHeaderToken` | Function | `req: express.Request` | Parses a token from the `'Authorization': 'Bearer ${token}'` header, returning the token. |
-| `decryptHeaderToken` | Function | `req: express.Request` | Parses a token from the `'Authorization': 'Bearer ${token}'` header, decrypts it, and returns the decrypted data. |
-| `isTokenValid` | Function | `token` | Returns `true` or `false`. |
-| `invalidateToken` | Function | `token` | Invalidates a token within `authorizer`. |
-| `isAuthorized` | Function | `req: express.Request` | Parses a token from the `'Authorization': 'Bearer ${token}'`, checks if it's valid, and returns `true` or `false`. |
-| `authorize` | Function | `req: express.Request, res: express.Request, next` | Checks if the token is valid. If so, it calls next. If not, it calls `sendUnauthorized`.|
-| `sendUnauthorized` | Function | `res: express.Request` | Sends a 401 response with a pre-formatted data object in the same shape as `@sempervirens/endpoint`'s error response. |
+| `init` | function | `{ jwtPublicKey = '', jwtPrivateKey = '' }` | Initializes the instance properties. |
+| `encrypt` | function | `{ expiresIn = '', data: {} }` | Returns a JWT token. |
+| `decrypt` | function | `tokenOrReq` | Decrypts a JWT token. The token itself or an Express request object containing the authorization header may be given. |
+| `isTokenValid` | function | `tokenOrReq` | Returns `true` or `false`. The token itself or an Express request object containing the authorization header may be given. |
+| `invalidateToken` | function | `tokenOrReq` | Invalidates a token within `authorizer`. |
+| `resetToken` | function | `tokenOrReq` | Decrypts the original token, calculates the original token's `expiresIn`, and adds the `origIat` property to the data before generating a new token. |
+| `isAuthorized` | function | `req: express.Request` | Parses a token from the `'Authorization': 'Bearer ${token}'`, checks if it's valid, and returns `true` or `false`. |
+| `authorize` | function | `req: express.Request, res: express.Request, next` | Checks if the token is valid. If so, it calls next. If not, it calls `sendUnauthorized`.|
+| `sendUnauthorized` | function | `res: express.Request` | Sends a 401 response with a pre-formatted data object in the same shape as `@sempervirens/endpoint`'s error response. |
