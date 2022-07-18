@@ -84,7 +84,7 @@ app.get('/profile/:id', async (req, res, next) => {
 | `init` | function | `{ jwtPublicKey = '', jwtPrivateKey = '' }` | Initializes the instance properties. |
 | `encrypt` | function | `{ expiresIn = '', data: {} }` | Returns a JWT token. |
 | `decrypt` | function | `tokenOrReq` | Decrypts a JWT token. The token itself or an Express request object containing the authorization header may be given. |
-| `isTokenValid` | function | `tokenOrReq` | Returns `true` or `false`. The token itself or an Express request object containing the authorization header may be given. |
+| `isValid` | function | `tokenOrReq` | Returns `true` or `false`. The token itself or an Express request object containing the authorization header may be given. |
 | `invalidateToken` | function | `tokenOrReq` | Invalidates a token within `authorizer`. |
 | `resetToken` | function | `tokenOrReq` | Decrypts the original token, calculates the original token's `expiresIn`, and adds the `origIat` property to the data before generating a new token. |
 | `isAuthorized` | function | `req: express.Request` | Parses a token from the `'Authorization': 'Bearer ${token}'`, checks if it's valid, and returns `true` or `false`. |

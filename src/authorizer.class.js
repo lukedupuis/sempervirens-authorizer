@@ -68,7 +68,7 @@ export class Authorizer {
     return token;
   }
 
-  isTokenValid(tokenOrReq) {
+  isValid(tokenOrReq) {
     try {
       this.decrypt(tokenOrReq);
       return true;
@@ -113,7 +113,7 @@ export class Authorizer {
     if (this.#isValidStaticSecret(req)) {
       return true;
     } else {
-      const isValid = this.isTokenValid(req);
+      const isValid = this.isValid(req);
       return isValid;
     }
   }

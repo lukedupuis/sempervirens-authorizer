@@ -220,7 +220,7 @@ describe('1. authorizer', () => {
 
   // return;
 
-  describe('1.7. When "isTokenValid" is called', () => {
+  describe('1.7. When "isValid" is called', () => {
     // return;
 
     describe('1.7.1. When token is valid', () => {
@@ -228,7 +228,7 @@ describe('1. authorizer', () => {
       it('1.7.1.1. Should return true', () => {
         authorizer.init({ jwtPublicKey, jwtPrivateKey });
         const token = authorizer.encrypt({ expiresIn: '1m', data: { test: 1 } });
-        const isValid = authorizer.isTokenValid(token);
+        const isValid = authorizer.isValid(token);
         expect(isValid).to.be.true;
       });
     });
@@ -239,7 +239,7 @@ describe('1. authorizer', () => {
         authorizer.init({ jwtPublicKey, jwtPrivateKey });
         const token = authorizer.encrypt({ expiresIn: '.5s', data: { test: 1 } });
         await new Promise(resolve => setTimeout(resolve, 600));
-        const isValid = authorizer.isTokenValid(token);
+        const isValid = authorizer.isValid(token);
         expect(isValid).to.be.false;
       });
     });
@@ -256,10 +256,10 @@ describe('1. authorizer', () => {
       it('1.8.1.1. Should invalitate the token', () => {
         authorizer.init({ jwtPublicKey, jwtPrivateKey });
         const token = authorizer.encrypt({ expiresIn: '1m', data: { test: 1 } });
-        const isValid1 = authorizer.isTokenValid(token);
+        const isValid1 = authorizer.isValid(token);
         expect(isValid1).to.be.true;
         authorizer.invalidateToken(token);
-        const isValid2 = authorizer.isTokenValid(token);
+        const isValid2 = authorizer.isValid(token);
         expect(isValid2).to.be.false;
       });
     });
@@ -270,10 +270,10 @@ describe('1. authorizer', () => {
         authorizer.init({ jwtPublicKey, jwtPrivateKey });
         const token = authorizer.encrypt({ expiresIn: '1m', data: { test: 1 } });
         const req = { headers: { authorization: `Bearer ${token}` } };
-        const isValid1 = authorizer.isTokenValid(req);
+        const isValid1 = authorizer.isValid(req);
         expect(isValid1).to.be.true;
         authorizer.invalidateToken(req);
-        const isValid2 = authorizer.isTokenValid(token);
+        const isValid2 = authorizer.isValid(token);
         expect(isValid2).to.be.false;
       });
     });
