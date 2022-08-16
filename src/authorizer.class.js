@@ -8,7 +8,15 @@ export class Authorizer {
 
   #tokens = new Set();
 
-  constructor() {}
+  constructor() {
+    setInterval(() => {
+      this.#tokens.forEach(token => {
+        if (!this.isValid(token)) {
+          this.#tokens.delete(token);
+        }
+      });
+    }, 3600000);
+  }
 
   init({
     jwtPublicKey,
@@ -21,8 +29,6 @@ export class Authorizer {
     this.#jwtPrivateKey = jwtPrivateKey;
     this.#staticSecrets = staticSecrets || {};
   }
-
-
 
   // Tokens
 
@@ -89,7 +95,6 @@ export class Authorizer {
     const expiresIn = decrypted.exp - decrypted.iat;
     delete decrypted.exp;
     delete decrypted.iat;
-    this.invalidate(token);
     return this.encrypt({
       expiresIn,
       data: decrypted

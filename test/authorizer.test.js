@@ -433,4 +433,6 @@ describe('1. authorizer', () => {
     });
   });
 
+  after(() => setTimeout(() => process.exit(), 500));
+
 });
